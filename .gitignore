@@ -1,1 +1,23 @@
-Ignorame
+# Python caches
+__pycache__/
+*.py[cod]
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+
+# Environment files
+.env
+*.env
+
+# SQLite databases
+*.sqlite
+*.db
+
+# VSCode and other editors
+.vscode/
+.idea/
+
+# macOS
+.DS_Store
