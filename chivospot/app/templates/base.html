@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#1f1b4d">
+    <title>{% block title %}Chivospot{% endblock %}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  </head>
+  <body>
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <header class="site-shell" data-component="header">
+      <div class="container shell__inner">
+        <a class="brand" href="{{ url_for('main.event_list') }}" aria-label="Inicio Chivospot">
+          <span class="brand__badge" aria-hidden="true">CS</span>
+          <span class="brand__wordmark">Chivospot</span>
+        </a>
+        <nav class="site-nav" aria-label="Navegación principal">
+          <a href="{{ url_for('main.event_list') }}" class="site-nav__link">Inicio</a>
+          <a href="#experiencias" class="site-nav__link">Experiencias</a>
+          <a href="#filtros" class="site-nav__link">Filtros</a>
+          <a href="#inspiracion" class="site-nav__link">Inspiración</a>
+        </nav>
+        <div class="site-actions">
+          <span class="site-actions__status" role="status">Catálogo actualizado</span>
+          <a class="btn btn--primary" href="#filtros">Explorar ahora</a>
+        </div>
+      </div>
+    </header>
+    <main id="contenido" class="page">
+      {% block content %}{% endblock %}
+    </main>
+    <footer class="site-footer" data-component="footer">
+      <div class="container site-footer__inner">
+        <div class="site-footer__brand">
+          <a class="brand brand--footer" href="{{ url_for('main.event_list') }}">Chivospot</a>
+          <p class="site-footer__copy">&copy; {{ current_year }} — Haz que cada día cuente.</p>
+        </div>
+        <div class="site-footer__links" aria-label="Accesos rápidos">
+          <a href="#experiencias">Eventos</a>
+          <a href="#filtros">Filtros</a>
+          <a href="mailto:hola@chivospot.com">Contacto</a>
+        </div>
+        <div class="site-footer__cta">
+          <p>¿Organizas eventos?</p>
+          <a class="btn btn--ghost-inverse" href="#">Pronto podrás publicar</a>
+        </div>
+      </div>
+    </footer>
+  </body>
+</html>

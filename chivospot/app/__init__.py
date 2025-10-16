@@ -1,4 +1,6 @@
 import os
+from datetime import datetime
+
 from flask import Flask
 from dotenv import load_dotenv
 
@@ -32,5 +34,11 @@ def create_app(test_config: dict | None = None) -> Flask:
     from .routes.main import main_bp
 
     app.register_blueprint(main_bp)
+
+    @app.context_processor
+    def inject_current_year():
+        return {
+            "current_year": datetime.now().year
+        }
 
     return app

@@ -8,9 +8,12 @@ venv/
 ENV/
 
 # Environment files
+
+/.env
+*.env
+!chivospot/.env
 .env
 *.env
-
 # SQLite databases
 *.sqlite
 *.db
