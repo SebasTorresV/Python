@@ -1,0 +1,120 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ event.title }} | Chivospot{% endblock %}
+
+{% block content %}
+<section class="detail-hero">
+  <div class="container detail-hero__layout">
+    <div class="detail-hero__copy">
+      <a class="detail-hero__back" href="{{ url_for('main.event_list') }}">← Volver al catálogo</a>
+      <span class="detail-hero__eyebrow">{{ event.category or 'Evento' }}</span>
+      <h1>{{ event.title }}</h1>
+      <p>{{ event.description or 'Descubre todos los detalles del evento, accede a la ubicación exacta y consigue tus tickets en segundos.' }}</p>
+      <div class="detail-hero__tags">
+        <span class="meta-chip meta-chip--accent">{{ event.price if event.price else 'Gratis' }}</span>
+        <span class="meta-chip">{{ event.starts_at.strftime('%A %d %b · %H:%M') }}</span>
+        {% if event.ends_at %}
+          <span class="meta-chip">Termina {{ event.ends_at.strftime('%H:%M') }}</span>
+        {% endif %}
+        {% if distance_km is not none %}
+          <span class="meta-chip">{{ '%.1f'|format(distance_km) }} km</span>
+        {% endif %}
+      </div>
+    </div>
+    <aside class="detail-hero__actions" aria-label="Acciones rápidas">
+      <div class="action-card">
+        <h2>Planifica tu visita</h2>
+        <ul class="action-card__list">
+          {% if event.address %}
+            <li>
+              <span class="action-card__label">Dirección</span>
+              <span class="action-card__value">{{ event.address }}{% if event.city %}, {{ event.city }}{% endif %}</span>
+            </li>
+          {% endif %}
+          {% if event.venue %}
+            <li>
+              <span class="action-card__label">Lugar</span>
+              <span class="action-card__value">{{ event.venue }}</span>
+            </li>
+          {% endif %}
+          {% if event.organizer %}
+            <li>
+              <span class="action-card__label">Organiza</span>
+              <span class="action-card__value">{{ event.organizer.name }}</span>
+            </li>
+          {% endif %}
+        </ul>
+        <div class="action-card__cta">
+          {% if event.lat and event.lon %}
+            <a class="btn btn--secondary" href="https://www.google.com/maps/dir/?api=1&destination={{ event.lat }},{{ event.lon }}" target="_blank" rel="noopener">Cómo llegar</a>
+          {% endif %}
+          {% if event.tickets_url %}
+            <a class="btn btn--primary" href="{{ event.tickets_url }}" target="_blank" rel="noopener">Tickets</a>
+          {% endif %}
+          {% if event.source_url %}
+            <a class="btn btn--ghost" href="{{ event.source_url }}" target="_blank" rel="noopener">Sitio oficial</a>
+          {% endif %}
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="detail-body">
+  <div class="container detail-body__grid">
+    <article class="detail-body__content">
+      <h2>Lo que debes saber</h2>
+      <p>{{ event.description or 'Aún no tenemos una descripción ampliada, pero puedes revisar la información de contacto o visitar el sitio oficial para más detalles.' }}</p>
+      <div class="detail-body__schedule">
+        <h3>Fechas y horarios</h3>
+        <ul>
+          <li><strong>Inicio:</strong> {{ event.starts_at.strftime('%A %d %b %Y · %H:%M') }}</li>
+          {% if event.ends_at %}
+            <li><strong>Fin:</strong> {{ event.ends_at.strftime('%A %d %b %Y · %H:%M') }}</li>
+          {% endif %}
+        </ul>
+      </div>
+      {% if event.organizer %}
+        <div class="detail-body__organizer">
+          <h3>Sobre el organizador</h3>
+          <p>{{ event.organizer.name }}</p>
+          <ul class="detail-body__links">
+            {% if event.organizer.website %}
+              <li><a href="{{ event.organizer.website }}" target="_blank" rel="noopener">Sitio web</a></li>
+            {% endif %}
+            {% if event.organizer.email %}
+              <li><a href="mailto:{{ event.organizer.email }}">Enviar correo</a></li>
+            {% endif %}
+            {% if event.organizer.phone %}
+              <li><a href="tel:{{ event.organizer.phone }}">Llamar</a></li>
+            {% endif %}
+          </ul>
+        </div>
+      {% endif %}
+    </article>
+    <aside class="detail-body__sidebar">
+      <div class="info-card">
+        <h3>Consejos rápidos</h3>
+        <ul>
+          <li>Llega 15 minutos antes para asegurar un buen lugar.</li>
+          <li>Consulta el pronóstico del clima si el evento es al aire libre.</li>
+          <li>Comparte el evento con amigos y organizan juntos.</li>
+        </ul>
+      </div>
+      {% if related_events %}
+        <div class="info-card">
+          <h3>También te puede interesar</h3>
+          <ul class="related-list">
+            {% for related in related_events %}
+              <li>
+                <a href="{{ url_for('main.event_detail', event_id=related.id) }}">{{ related.title }}</a>
+                <span>{{ related.starts_at.strftime('%d %b · %H:%M') }}</span>
+              </li>
+            {% endfor %}
+          </ul>
+        </div>
+      {% endif %}
+    </aside>
+  </div>
+</section>
+{% endblock %}

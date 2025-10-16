@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+
+{% block title %}Eventos | Chivospot{% endblock %}
+
+{% block content %}
+<section class="hero hero--spotlight" id="experiencias">
+  <div class="container hero__grid">
+    <div class="hero__content">
+      <p class="hero__kicker">Agenda viva</p>
+      <h1>Planes vibrantes para hoy, mañana y el fin de semana.</h1>
+      <p>Comparte tu ubicación para priorizar los eventos más cercanos y deja que los filtros inteligentes encuentren la combinación perfecta entre categoría, fecha y presupuesto.</p>
+      <div class="hero__buttons">
+        <a class="btn btn--primary" href="#filtros">Aplicar filtros</a>
+        <a class="btn btn--ghost" href="#filtros">Activar cercanía</a>
+      </div>
+      <div class="hero__promises">
+        <span class="promise">Curado por expertos locales</span>
+        <span class="promise">Actualizado diariamente</span>
+        <span class="promise">Accesos rápidos a mapas y tickets</span>
+      </div>
+    </div>
+    <aside class="hero__panel" aria-label="Resumen de actividad">
+      <div class="panel-card">
+        <span class="panel-card__label">Eventos activos</span>
+        <span class="panel-card__value">{{ events|length }}</span>
+        <span class="panel-card__hint">Publicados en los últimos 30 días</span>
+      </div>
+      <div class="panel-card">
+        {% if user_location.lat is not none and user_location.lon is not none %}
+          <span class="panel-card__label">Orden personal</span>
+          <span class="panel-card__value">Cerca de ti</span>
+          <span class="panel-card__hint">Basado en tu geolocalización</span>
+        {% else %}
+          <span class="panel-card__label">Tip rápido</span>
+          <span class="panel-card__value">Activa GPS</span>
+          <span class="panel-card__hint">Ordenaremos por distancia</span>
+        {% endif %}
+      </div>
+      <div class="panel-card">
+        <span class="panel-card__label">Próximo destacado</span>
+        {% if events %}
+          <span class="panel-card__value">{{ events[0].title }}</span>
+          <span class="panel-card__hint">{{ events[0].starts_at.strftime('%d %b · %H:%M') }}</span>
+        {% else %}
+          <span class="panel-card__value">Pronto</span>
+          <span class="panel-card__hint">Cargaremos nuevas experiencias</span>
+        {% endif %}
+      </div>
+    </aside>
+  </div>
+</section>
+
+<section class="filters" id="filtros" aria-label="Filtro de eventos">
+  <div class="container filters__layout">
+    <header class="filters__header">
+      <h2>Refina tu búsqueda</h2>
+      <p>Combina filtros para descubrir eventos a tu medida.</p>
+    </header>
+    <form method="get" class="filters__form">
+      <div class="filters__quick">
+        <span class="filters__quick-label">Cuándo</span>
+        {% for value, label in when_options %}
+          <button name="when" value="{{ value }}" class="chip chip--toggle {% if filters.when == value %}is-active{% endif %}" type="submit">{{ label }}</button>
+        {% endfor %}
+      </div>
+      <div class="filters__grid">
+        <label class="field">
+          <span class="field__label">Categoría</span>
+          <select name="category" class="input input--select">
+            <option value="">Todas</option>
+            {% for category in categories %}
+              <option value="{{ category }}" {% if filters.category == category %}selected{% endif %}>{{ category }}</option>
+            {% endfor %}
+          </select>
+        </label>
+        <label class="field">
+          <span class="field__label">Precio</span>
+          <select name="price" class="input input--select">
+            <option value="">Todos</option>
+            <option value="free" {% if filters.price == 'free' %}selected{% endif %}>Gratis</option>
+            <option value="paid" {% if filters.price == 'paid' %}selected{% endif %}>De pago</option>
+          </select>
+        </label>
+      </div>
+      <div class="filters__actions">
+        <button type="submit" class="btn btn--secondary">Actualizar resultados</button>
+        <a class="btn btn--ghost" href="{{ url_for('main.event_list') }}">Limpiar filtros</a>
+      </div>
+    </form>
+    <div class="filters__state" role="status">
+      {% if user_location.lat is not none and user_location.lon is not none %}
+        <span class="chip chip--status">Ordenado por cercanía</span>
+      {% else %}
+        <span class="chip chip--status chip--status-muted">Comparte tu ubicación para priorizar la distancia</span>
+      {% endif %}
+      {% if filters.when %}
+        <span class="chip chip--status">{{ filters.when|title }}</span>
+      {% endif %}
+      {% if filters.category %}
+        <span class="chip chip--status">{{ filters.category }}</span>
+      {% endif %}
+      {% if filters.price %}
+        <span class="chip chip--status">{{ 'Gratis' if filters.price == 'free' else 'De pago' }}</span>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<section class="events" id="inspiracion" aria-live="polite">
+  <div class="container events__wrapper">
+    {% if events %}
+      <ul class="events__grid">
+        {% for event in events %}
+          {% if user_location.lat is not none and user_location.lon is not none %}
+            {% set detail_url = url_for('main.event_detail', event_id=event.id, lat=user_location.lat, lon=user_location.lon) %}
+          {% else %}
+            {% set detail_url = url_for('main.event_detail', event_id=event.id) %}
+          {% endif %}
+          <li class="event-card" itemscope itemtype="https://schema.org/Event">
+            <div class="event-card__visual" aria-hidden="true">
+              <span class="event-card__pill">{{ event.category or 'Evento' }}</span>
+            </div>
+            <div class="event-card__body">
+              <p class="event-card__date" itemprop="startDate" content="{{ event.starts_at.isoformat() }}">{{ event.starts_at.strftime('%A %d %b · %H:%M') }}</p>
+              <h2 class="event-card__title" itemprop="name">
+                <a href="{{ detail_url }}">{{ event.title }}</a>
+              </h2>
+              <p class="event-card__place">
+                {% if event.venue %}<span itemprop="location">{{ event.venue }}</span>{% endif %}
+                {% if event.city %}<span> · {{ event.city }}</span>{% endif %}
+              </p>
+              <div class="event-card__meta">
+                {% if event.distance_km is not none %}
+                  <span class="meta-chip">{{ '%.1f'|format(event.distance_km) }} km</span>
+                {% endif %}
+                <span class="meta-chip meta-chip--accent">{{ event.price if event.price else 'Gratis' }}</span>
+              </div>
+            </div>
+            <div class="event-card__cta">
+              <a class="btn btn--ghost" href="{{ detail_url }}">Ver detalles</a>
+              {% if event.tickets_url %}
+                <a class="btn btn--primary" href="{{ event.tickets_url }}" target="_blank" rel="noopener" itemprop="offers">Tickets</a>
+              {% endif %}
+            </div>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <div class="empty-state">
+        <h2>No encontramos eventos con estos filtros</h2>
+        <p>Prueba con otra combinación o vuelve más tarde para descubrir nuevas experiencias.</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+{% endblock %}
