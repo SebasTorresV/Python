@@ -13,6 +13,11 @@ filtros rápidos y accesos directos para obtener rutas o comprar boletos.
 - Filtros rápidos por fecha (hoy/fin de semana/próximos), categoría y precio.
 - Endpoint de salud `/health` y rutas públicas `/` y `/events/<id>` listas para despliegue.
 - Script de semillas `seed.py` con datos de ejemplo para pruebas manuales.
+- API REST sencilla con Flask y arquitectura basada en application factory.
+- Base de datos SQLite gestionada con Flask-SQLAlchemy y Flask-Migrate.
+- Modelos `Organizer` y `Event` listos para soportar el catálogo de eventos.
+- Endpoints iniciales `/health` y `/` como placeholders hasta crear las vistas HTML.
+- Estructura preparada para ampliar con blueprints, servicios y plantillas.
 
 ## Configuración rápida
 
@@ -54,3 +59,20 @@ categorías, precios y ubicaciones para probar filtros y ordenamientos.
 - Añadir formularios para que los organizadores envíen eventos (`/organizer/submit`).
 - Publicar endpoints JSON (`/api/events`) para integraciones externas.
 - Implementar autenticación y validaciones adicionales antes de abrir autopublicación.
+flask --app app:create_app run
+```
+
+Para entornos de producción, define tus variables en un archivo `.env` (usa
+`.env.example` como referencia) o mediante variables de entorno.
+
+## Migraciones
+
+Inicializa y ejecuta migraciones con:
+
+```bash
+flask db init
+flask db migrate -m "init"
+flask db upgrade
+```
+
+La base de datos SQLite se creará dentro del directorio `instance/`.

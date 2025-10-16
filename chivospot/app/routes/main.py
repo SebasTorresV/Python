@@ -10,6 +10,7 @@ from sqlalchemy import or_
 from ..extensions import db
 from ..models import Event, EventStatus
 from ..services.geo import haversine_distance
+from flask import Blueprint, jsonify
 
 main_bp = Blueprint("main", __name__)
 
@@ -165,4 +166,13 @@ def event_detail(event_id: int):
         event=event,
         map_url=_build_map_link(event),
         distance_km=distance_km,
+    return jsonify({"status": "ok"})
+
+
+@main_bp.get("/")
+def index() -> str:
+    """Temporary landing page placeholder until templates arrive."""
+    return (
+        "Bienvenido a Chivospot. Pronto podrás descubrir eventos cercanos desde "
+        "esta página."
     )
